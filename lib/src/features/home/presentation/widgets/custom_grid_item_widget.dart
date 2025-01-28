@@ -83,24 +83,26 @@ class CustomGridItemWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '\$${item['price']}',
-                      style: getSemiBoldStyle(
-                        fontSize: priceSize,
-                        color: ColorsManager.primaryColor,
+              Flexible(
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '\$${item['price']}',
+                        style: getSemiBoldStyle(
+                          fontSize: priceSize,
+                          color: ColorsManager.primaryColor,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: '/ ${item['unit']} pcs',
-                      style: getMediumStyle(
-                        fontSize: unitSize,
-                        color: ColorsManager.greyColor,
+                      TextSpan(
+                        text: '/ ${item['unit']} pcs',
+                        style: getMediumStyle(
+                          fontSize: unitSize,
+                          color: ColorsManager.greyColor,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               InkWell(

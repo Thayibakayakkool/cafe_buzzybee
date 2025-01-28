@@ -9,6 +9,7 @@ import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc
 import 'package:cafe_buzzybee/src/features/home/presentation/responsive/mobile/cart_mobile_page.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_grid_item_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_menu_item_tile_widget.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_pop_up_menu_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_rich_text_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_search_text_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -71,10 +72,24 @@ class HomeMobilePage extends StatelessWidget {
                 ],
               ),
               kSizedBox15,
-              CustomSearchTextFieldWidget(
-                width: screenSize.width * 0.6,
-                height: screenSize.height * 0.042,
-                fontSize: screenSize.width * 0.026,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomSearchTextFieldWidget(
+                    width: screenSize.width * 0.83,
+                    height: screenSize.height * 0.042,
+                    fontSize: screenSize.width * 0.027,
+                  ),
+                  Container(
+                      width: screenSize.width * 0.08,
+                      height: screenSize.height * 0.046,
+                      decoration: BoxDecoration(
+                        color: ColorsManager.whiteColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: ColorsManager.primaryColor)
+                      ),
+                      child:  CustomPopUpMenuWidget(iconSize: screenSize.width * 0.035,fontSize: 15,)),
+                ],
               ),
               kSizedBox20,
               BlocBuilder<ItemBloc, ItemState>(
@@ -111,9 +126,14 @@ class HomeMobilePage extends StatelessWidget {
                   builder: (context, state) {
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
+                        crossAxisCount: state.crossAxisCount,
                         mainAxisSpacing: screenSize.height * 0.01,
                         crossAxisSpacing: screenSize.width * 0.012,
+                        childAspectRatio: state.crossAxisCount == 2
+                            ? 1 / 1
+                            : state.crossAxisCount == 3
+                            ? 1.1 / 2
+                            : 0.3 / 1,
                       ),
                       itemCount: state.filteredMenuItems.length,
                       itemBuilder: (context, index) {

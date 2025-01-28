@@ -21,3 +21,11 @@ class SearchItemEvent extends ItemEvent {
   @override
   List<Object?> get props => [query];
 }
+class ChangeGridColumnEvent extends ItemEvent {
+  final int crossAxisCount;
+
+  const ChangeGridColumnEvent(this.crossAxisCount);
+
+  @override
+  List<Object?> get props => [crossAxisCount];
+}

@@ -1,7 +1,6 @@
 import 'package:cafe_buzzybee/src/core/config/colors.dart';
 import 'package:cafe_buzzybee/src/core/config/constants.dart';
 import 'package:cafe_buzzybee/src/core/config/styles.dart';
-import 'package:cafe_buzzybee/src/core/config/values.dart';
 import 'package:cafe_buzzybee/src/core/utils/utils.dart';
 import 'package:cafe_buzzybee/src/features/home/domain/entities/cart_item_entity.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
@@ -10,6 +9,7 @@ import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_cart_list_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_grid_item_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_menu_item_tile_widget.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_pop_up_menu_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_rich_text_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_row_with_icon_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_search_text_field_widget.dart';
@@ -63,21 +63,16 @@ class HomeDesktopPage extends StatelessWidget {
                           ),
                           kSizedBoxW20,
                           Container(
-                            width: screenSize.width * 0.03,
-                            height: screenSize.height * 0.05,
-                            decoration: BoxDecoration(
-                                color: ColorsManager.whiteColor,
-                                borderRadius:
-                                    BorderRadius.circular(AppSize.s8)),
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.filter_alt_outlined,
-                                color: ColorsManager.blackColor,
-                                size: screenSize.width * 0.015,
+                              width: screenSize.width * 0.034,
+                              height: screenSize.height * 0.055,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ),
-                          ),
+                              child: CustomPopUpMenuWidget(
+                                fontSize: 14,
+                                iconSize: screenSize.width * 0.02,
+                              )),
                         ],
                       ),
                     ],
@@ -115,9 +110,14 @@ class HomeDesktopPage extends StatelessWidget {
                         return GridView.builder(
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
+                            crossAxisCount: state.crossAxisCount,
                             mainAxisSpacing: screenSize.height * 0.02,
                             crossAxisSpacing: screenSize.width * 0.012,
+                            childAspectRatio: state.crossAxisCount == 2
+                                ? 2 / 1.3
+                                : state.crossAxisCount == 3
+                                    ? 1 / 1
+                                    : 1.4 / 2,
                           ),
                           itemCount: state.filteredMenuItems.length,
                           itemBuilder: (context, index) {

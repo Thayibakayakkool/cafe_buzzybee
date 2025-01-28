@@ -1,4 +1,5 @@
 import 'package:cafe_buzzybee/src/core/services/injection/injection_container.dart';
+import 'package:cafe_buzzybee/src/core/utils/utils.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/pages/home_page.dart';
@@ -16,10 +17,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = Utils().getScreenSize(context);
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<CartBloc>()),
-        BlocProvider(create: (context) => ItemBloc()),
+        BlocProvider(create: (context) => ItemBloc(screenSize.width)),
       ],
       child: const MaterialApp(
         title: 'Cafe BuzzyBee',
