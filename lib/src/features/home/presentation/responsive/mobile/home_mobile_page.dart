@@ -4,7 +4,8 @@ import 'package:cafe_buzzybee/src/core/config/styles.dart';
 import 'package:cafe_buzzybee/src/core/config/values.dart';
 import 'package:cafe_buzzybee/src/core/utils/utils.dart';
 import 'package:cafe_buzzybee/src/features/home/domain/entities/cart_item_entity.dart';
-import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/responsive/mobile/cart_mobile_page.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_grid_item_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_menu_item_tile_widget.dart';
@@ -12,15 +13,12 @@ import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_rich
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_search_text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-
-class HomeMobilePage extends HookWidget {
+class HomeMobilePage extends StatelessWidget {
   const HomeMobilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedMenu = useState('Croissant');
     Size screenSize = Utils().getScreenSize(context);
     return SafeArea(
       child: Scaffold(
@@ -79,69 +77,76 @@ class HomeMobilePage extends HookWidget {
                 fontSize: screenSize.width * 0.026,
               ),
               kSizedBox20,
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(
-                    menuItem.length,
-                    (index) {
-                      return CustomMenuItemTileWidget(
-                        image: menuItem[index]['image']!,
-                        text: menuItem[index]['text']!,
-                        isSelected:
-                            selectedMenu.value == menuItem[index]['text']!,
-                        onTap: () {
-                          selectedMenu.value = menuItem[index]['text']!;
+              BlocBuilder<ItemBloc, ItemState>(
+                builder: (context, state) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(
+                        state.menuCategories.length,
+                        (index) {
+                          return CustomMenuItemTileWidget(
+                            image: state.menuCategories[index]['image']!,
+                            text: state.menuCategories[index]['text']!,
+                            isSelected: state.selectedMenu ==
+                                state.menuCategories[index]['text']!,
+                            onTap: () {
+                              context.read<ItemBloc>().add(
+                                    SelectMenuCategoryEvent(
+                                        state.menuCategories[index]['text']!),
+                                  );
+                            },
+                            imageWidth: screenSize.width * 0.05,
+                            textFontSize: screenSize.width * 0.03,
+                          );
                         },
-                        imageWidth: screenSize.width * 0.05,
-                        textFontSize: screenSize.width * 0.03,
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ),
+                  );
+                },
               ),
               kSizedBox30,
               Expanded(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: screenSize.height * 0.01,
-                    crossAxisSpacing: screenSize.width * 0.012,
-                  ),
-                  itemCount: menuItems.containsKey(selectedMenu.value)
-                      ? menuItems[selectedMenu.value]!.length
-                      : 0,
-                  itemBuilder: (context, index) {
-                    if (!menuItems.containsKey(selectedMenu.value)) {
-                      return const SizedBox();
-                    }
-
-                    final item = menuItems[selectedMenu.value]![index];
-                    return CustomGridItemWidget(
-                      imageHeight: screenSize.height * 0.21,
-                      imageWidth: screenSize.width * 0.5,
-                      nameSize: screenSize.width * 0.04,
-                      descriptionSize:  screenSize.width * 0.025,
-                      priceSize: screenSize.width * 0.029,
-                      unitSize: screenSize.width * 0.022,
-                      iconSize: screenSize.width * 0.05,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenSize.width * 0.005,
-                        vertical: screenSize.height * 0.005,
+                child: BlocBuilder<ItemBloc, ItemState>(
+                  builder: (context, state) {
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: screenSize.height * 0.01,
+                        crossAxisSpacing: screenSize.width * 0.012,
                       ),
-                      item: item,
-                      onAddToCart: () async {
-                        final cartItem = CartItemEntity(
-                          name: item['name'],
-                          description: item['description'],
-                          price: item['price'],
-                          id: item['id'].hashCode,
-                          image: item['image'],
-                          unit: item['unit'],
-                        );
+                      itemCount: state.filteredMenuItems.length,
+                      itemBuilder: (context, index) {
+                        final item = state.filteredMenuItems[index];
 
-                        BlocProvider.of<CartBloc>(context)
-                            .add(AddToCartEvent(cartItem));
+                        return CustomGridItemWidget(
+                          imageHeight: screenSize.height * 0.21,
+                          imageWidth: screenSize.width * 0.5,
+                          nameSize: screenSize.width * 0.04,
+                          descriptionSize: screenSize.width * 0.025,
+                          priceSize: screenSize.width * 0.029,
+                          unitSize: screenSize.width * 0.022,
+                          iconSize: screenSize.width * 0.05,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenSize.width * 0.005,
+                            vertical: screenSize.height * 0.005,
+                          ),
+                          item: item,
+                          onAddToCart: () async {
+                            final cartItem = CartItemEntity(
+                              name: item['name'],
+                              description: item['description'],
+                              price: item['price'],
+                              id: item['id'].hashCode,
+                              image: item['image'],
+                              unit: item['unit'],
+                              quantity: 1,
+                            );
+
+                            BlocProvider.of<CartBloc>(context)
+                                .add(AddToCartEvent(cartItem));
+                          },
+                        );
                       },
                     );
                   },

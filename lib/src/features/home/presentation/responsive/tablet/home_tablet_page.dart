@@ -4,8 +4,9 @@ import 'package:cafe_buzzybee/src/core/config/styles.dart';
 import 'package:cafe_buzzybee/src/core/config/values.dart';
 import 'package:cafe_buzzybee/src/core/utils/utils.dart';
 import 'package:cafe_buzzybee/src/features/home/domain/entities/cart_item_entity.dart';
-import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
 import 'package:cafe_buzzybee/src/core/common/widgets/custom_button_widget.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_cart_list_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_grid_item_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_menu_item_tile_widget.dart';
@@ -15,15 +16,12 @@ import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_sear
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_total_container_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-
-class HomeTabletPage extends HookWidget {
+class HomeTabletPage extends StatelessWidget {
   const HomeTabletPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedMenu = useState('Croissant');
     Size screenSize = Utils().getScreenSize(context);
     return Scaffold(
       body: Row(
@@ -43,7 +41,8 @@ class HomeTabletPage extends HookWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomRichTextWidget(fontSize: screenSize.width * 0.03),
+                          CustomRichTextWidget(
+                              fontSize: screenSize.width * 0.03),
                           kSizedBox5,
                           Text(
                             ' Discover whatever you need easily',
@@ -60,8 +59,7 @@ class HomeTabletPage extends HookWidget {
                         height: screenSize.height * 0.05,
                         decoration: BoxDecoration(
                             color: ColorsManager.whiteColor,
-                            borderRadius:
-                                BorderRadius.circular(AppSize.s8)),
+                            borderRadius: BorderRadius.circular(AppSize.s8)),
                         child: IconButton(
                           onPressed: () {},
                           icon: Icon(
@@ -80,69 +78,77 @@ class HomeTabletPage extends HookWidget {
                     fontSize: screenSize.width * 0.015,
                   ),
                   kSizedBox20,
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(
-                        menuItem.length,
-                        (index) {
-                          return CustomMenuItemTileWidget(
-                            image: menuItem[index]['image']!,
-                            text: menuItem[index]['text']!,
-                            isSelected:
-                                selectedMenu.value == menuItem[index]['text']!,
-                            onTap: () {
-                              selectedMenu.value = menuItem[index]['text']!;
+                  BlocBuilder<ItemBloc, ItemState>(
+                    builder: (context, state) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            state.menuCategories.length,
+                            (index) {
+                              return CustomMenuItemTileWidget(
+                                image: state.menuCategories[index]['image']!,
+                                text: state.menuCategories[index]['text']!,
+                                isSelected: state.selectedMenu ==
+                                    state.menuCategories[index]['text']!,
+                                onTap: () {
+                                  context.read<ItemBloc>().add(
+                                        SelectMenuCategoryEvent(state
+                                            .menuCategories[index]['text']!),
+                                      );
+                                },
+                                imageWidth: screenSize.width * 0.025,
+                                textFontSize: screenSize.width * 0.02,
+                              );
                             },
-                            imageWidth: screenSize.width * 0.025,
-                            textFontSize: screenSize.width * 0.02,
-                          );
-                        },
-                      ),
-                    ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   kSizedBox20,
                   Expanded(
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        mainAxisSpacing: screenSize.height * 0.02,
-                        crossAxisSpacing: screenSize.width * 0.02,
-                      ),
-                      itemCount: menuItems.containsKey(selectedMenu.value)
-                          ? menuItems[selectedMenu.value]!.length
-                          : 0,
-                      itemBuilder: (context, index) {
-                        if (!menuItems.containsKey(selectedMenu.value)) {
-                          return const SizedBox();
-                        }
-
-                        final item = menuItems[selectedMenu.value]![index];
-                        return CustomGridItemWidget(
-                          imageHeight: screenSize.height * 0.25,
-                          imageWidth: screenSize.width * 0.6,
-                          nameSize: screenSize.width * 0.035,
-                          descriptionSize:  screenSize.width * 0.023,
-                          priceSize: screenSize.width * 0.03,
-                          unitSize: screenSize.width * 0.025,
-                          iconSize: 32,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenSize.width * 0.009,
-                            vertical: screenSize.height * 0.005,
+                    child: BlocBuilder<ItemBloc, ItemState>(
+                      builder: (context, state) {
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1,
+                            mainAxisSpacing: screenSize.height * 0.02,
+                            crossAxisSpacing: screenSize.width * 0.02,
                           ),
-                          item: item,
-                          onAddToCart: () async {
-                            final cartItem = CartItemEntity(
-                              name: item['name'],
-                              description: item['description'],
-                              price: item['price'],
-                              id: item['id'].hashCode,
-                              image: item['image'],
-                              unit: item['unit'],
-                            );
+                          itemCount: state.filteredMenuItems.length,
+                          itemBuilder: (context, index) {
+                            final item = state.filteredMenuItems[index];
 
-                            BlocProvider.of<CartBloc>(context)
-                                .add(AddToCartEvent(cartItem));
+                            return CustomGridItemWidget(
+                              imageHeight: screenSize.height * 0.25,
+                              imageWidth: screenSize.width * 0.6,
+                              nameSize: screenSize.width * 0.035,
+                              descriptionSize: screenSize.width * 0.023,
+                              priceSize: screenSize.width * 0.03,
+                              unitSize: screenSize.width * 0.025,
+                              iconSize: 32,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width * 0.009,
+                                vertical: screenSize.height * 0.005,
+                              ),
+                              item: item,
+                              onAddToCart: () async {
+                                final cartItem = CartItemEntity(
+                                  name: item['name'],
+                                  description: item['description'],
+                                  price: item['price'],
+                                  id: item['id'].hashCode,
+                                  image: item['image'],
+                                  unit: item['unit'],
+                                  quantity: 1,
+                                );
+
+                                BlocProvider.of<CartBloc>(context)
+                                    .add(AddToCartEvent(cartItem));
+                              },
+                            );
                           },
                         );
                       },
@@ -202,19 +208,11 @@ class HomeTabletPage extends HookWidget {
                       height: screenSize.height * 0.045,
                       onPressed: () {
                         context.read<CartBloc>().add(ClearCartEvent());
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: ColorsManager.primaryColor,
-                            content: Center(
-                              child: Text(
-                                'Order successfully!',
-                                style: getSemiBoldStyle(
-                                  fontSize: screenSize.width * 0.02,
-                                  color: ColorsManager.whiteColor,
-                                ),
-                              ),
-                            ),
-                          ),
+                        Utils().showSnackBar(
+                          content: 'Order successfully!',
+                          color: ColorsManager.primaryColor,
+                          fontSize: screenSize.width * 0.02,
+                          context: context,
                         );
                       })
                 ],

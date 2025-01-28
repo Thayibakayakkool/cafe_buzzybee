@@ -1,7 +1,6 @@
 part of 'cart_bloc.dart';
 
-@immutable
-abstract class CartEvent extends Equatable {
+sealed class CartEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }

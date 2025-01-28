@@ -1,5 +1,6 @@
 import 'package:cafe_buzzybee/src/core/services/injection/injection_container.dart';
-import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/item/item_bloc.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,8 +16,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<CartBloc>()..add(GetCartItemsEvent()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<CartBloc>()),
+        BlocProvider(create: (context) => ItemBloc()),
+      ],
       child: const MaterialApp(
         title: 'Cafe BuzzyBee',
         debugShowCheckedModeBanner: false,

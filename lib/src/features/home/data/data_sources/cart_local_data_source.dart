@@ -16,14 +16,21 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
   CartLocalDataSourceImpl({required this.cartBox});
 
   @override
-  Future<void> addToCart(CartItemModel cartItem) async {
+  Future<void> addToCart(CartItemModel cartItem, {bool isIncrement = true}) async {
     try {
       final item = cartBox
           .query(CartItemModel_.name.equals(cartItem.name))
           .build()
           .findFirst();
+
       if (item != null) {
-        item.quantity += cartItem.quantity;
+        if (isIncrement) {
+          item.quantity += 1;
+        } else {
+          if (item.quantity > 1) {
+            item.quantity -= 1;
+          }
+        }
         cartBox.put(item);
       } else {
         cartBox.put(CartItemModel(
@@ -31,7 +38,7 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
           image: cartItem.image,
           description: cartItem.description,
           price: cartItem.price,
-          quantity: cartItem.quantity,
+          quantity: 1,
           unit: cartItem.unit,
         ));
       }
@@ -56,5 +63,9 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 505);
     }
+  }
+
+  Stream<List<CartItemModel>> watchCartItems() {
+    return cartBox.query().watch(triggerImmediately: true).map((query) => query.find());
   }
 }

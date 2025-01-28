@@ -41,10 +41,10 @@ dependencies:
   objectbox_flutter_libs: any
   flutter_bloc: ^9.0.0
   get_it: ^8.0.3
-  flutter_hooks: ^0.20.5
   path_provider: ^2.1.5
   path:
   view_more: ^0.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

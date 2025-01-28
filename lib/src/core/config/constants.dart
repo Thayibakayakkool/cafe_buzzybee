@@ -13,6 +13,11 @@ SizedBox kSizedBox5 = const SizedBox(
 SizedBox kSizedBox8 = const SizedBox(
   height: 8,
 );
+
+SizedBox kSizedBox10 = const SizedBox(
+  height: 10,
+);
+
 SizedBox kSizedBox15 = const SizedBox(
   height: 15,
 );
@@ -413,7 +418,7 @@ final Map<String, List<Map<String, dynamic>>> menuItems = {
   'Ice cream': iceCreamItem,
 };
 
-final menuItem = [
+final menu = [
   {'text': 'Signature', 'image': Assets.signature},
   {'text': 'Croissant', 'image': Assets.croissant},
   {'text': 'Waffle', 'image': Assets.waffle},

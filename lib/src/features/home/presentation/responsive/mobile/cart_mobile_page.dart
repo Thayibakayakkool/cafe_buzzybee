@@ -1,8 +1,7 @@
 import 'package:cafe_buzzybee/src/core/config/colors.dart';
 import 'package:cafe_buzzybee/src/core/config/constants.dart';
-import 'package:cafe_buzzybee/src/core/config/styles.dart';
 import 'package:cafe_buzzybee/src/core/utils/utils.dart';
-import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart_bloc.dart';
+import 'package:cafe_buzzybee/src/features/home/presentation/bloc/cart/cart_bloc.dart';
 import 'package:cafe_buzzybee/src/core/common/widgets/custom_button_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_cart_list_widget.dart';
 import 'package:cafe_buzzybee/src/features/home/presentation/widgets/custom_row_with_icon_widget.dart';
@@ -67,19 +66,11 @@ class CartMobilePage extends StatelessWidget {
                   height: screenSize.height * 0.045,
                   onPressed: () {
                     context.read<CartBloc>().add(ClearCartEvent());
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: ColorsManager.primaryColor,
-                        content: Center(
-                          child: Text(
-                            'Order successfully!',
-                            style: getSemiBoldStyle(
-                              fontSize: screenSize.width * 0.04,
-                              color: ColorsManager.whiteColor,
-                            ),
-                          ),
-                        ),
-                      ),
+                    Utils().showSnackBar(
+                      content: 'Order successfully!',
+                      color: ColorsManager.primaryColor,
+                      fontSize: screenSize.width * 0.04,
+                      context: context,
                     );
                   })
             ],
