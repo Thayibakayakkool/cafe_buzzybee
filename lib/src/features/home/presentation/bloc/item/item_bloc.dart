@@ -9,20 +9,18 @@ part 'item_state.dart';
 class ItemBloc extends Bloc<ItemEvent, ItemState> {
   ItemBloc(double screenWidth)
       : super(ItemState(
-      menuCategories: menu,
-      selectedMenu: 'Croissant',
-      menuItems: menuItems,
-      filteredMenuItems: menuItems['Croissant'] ?? [],
-      crossAxisCount: _crossAxisCount(screenWidth))) {
+            menuCategories: menu,
+            selectedMenu: 'Croissant',
+            menuItems: menuItems,
+            filteredMenuItems: menuItems['Croissant'] ?? [],
+            crossAxisCount: _crossAxisCount(screenWidth))) {
     on<SelectMenuCategoryEvent>(_selectMenuCategoryEvent);
     on<SearchItemEvent>(_searchItemEvent);
-    on<ChangeGridColumnEvent>((event, emit) {
-      emit(state.copyWith(crossAxisCount: event.crossAxisCount));
-    });
+    on<ChangeGridColumnEvent>(_changeGridColumnEvent);
   }
 
-  Future<void> _selectMenuCategoryEvent(SelectMenuCategoryEvent event,
-      Emitter<ItemState> emit) async {
+  Future<void> _selectMenuCategoryEvent(
+      SelectMenuCategoryEvent event, Emitter<ItemState> emit) async {
     final selectedMenu = event.selectedMenu;
     emit(state.copyWith(
       selectedMenu: selectedMenu,
@@ -30,13 +28,18 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     ));
   }
 
-  Future<void> _searchItemEvent(SearchItemEvent event,
-      Emitter<ItemState> emit) async {
+  Future<void> _searchItemEvent(
+      SearchItemEvent event, Emitter<ItemState> emit) async {
     final searchTerm = event.query.toLowerCase();
     final filteredItems = state.menuItems[state.selectedMenu]?.where((item) {
       return item['name']!.toLowerCase().contains(searchTerm);
     }).toList();
     emit(state.copyWith(filteredMenuItems: filteredItems ?? []));
+  }
+
+  Future<void> _changeGridColumnEvent(
+      ChangeGridColumnEvent event, Emitter<ItemState> emit) async {
+    emit(state.copyWith(crossAxisCount: event.crossAxisCount));
   }
 
   static int _crossAxisCount(double screenWidth) {
