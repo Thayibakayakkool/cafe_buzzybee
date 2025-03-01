@@ -10,9 +10,9 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
   ItemBloc(double screenWidth)
       : super(ItemState(
             menuCategories: menu,
-            selectedMenu: 'Croissant',
+            selectedMenu: 'All',
             menuItems: menuItems,
-            filteredMenuItems: menuItems['Croissant'] ?? [],
+            filteredMenuItems: menuItems['All'] ?? [],
             crossAxisCount: _crossAxisCount(screenWidth))) {
     on<SelectMenuCategoryEvent>(_selectMenuCategoryEvent);
     on<SearchItemEvent>(_searchItemEvent);

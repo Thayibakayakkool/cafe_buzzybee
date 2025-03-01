@@ -49,24 +49,59 @@ class HomeTabletPage extends StatelessWidget {
                 ),
                 kSizedBoxW20,
                 Container(
-                  width: screenSize.width * 0.08,
-                  height: screenSize.height * 0.05,
+                  width: screenSize.width * 0.05,
+                  height: screenSize.height * 0.04,
                   decoration: BoxDecoration(
                       color: ColorsManager.whiteColor,
                       borderRadius: BorderRadius.circular(AppSize.s8)),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CartTabletPage(),
-                          ));
-                    },
-                    icon: Icon(
-                      Icons.shopping_cart,
-                      color: ColorsManager.primaryColor,
-                      size: screenSize.width * 0.025,
-                    ),
+                  child: Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CartTabletPage(),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.shopping_cart,
+                          color: ColorsManager.primaryColor,
+                          size: screenSize.width * 0.025,
+                        ),
+                      ),
+                      Positioned(
+                        right: 2,
+                        top: -3,
+                        child: BlocBuilder<CartBloc, CartState>(
+                          builder: (context, state) {
+                            if (state is CartLoaded && state.cartItems.isNotEmpty) {
+                              final cartItemCount = state.cartItems.length;
+
+                              return Container(
+                                padding: EdgeInsets.all(screenSize.width * 0.004),
+                                decoration: BoxDecoration(
+                                  color: ColorsManager.primaryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    cartItemCount.toString(),
+                                    style: TextStyle(
+                                      color: ColorsManager.whiteColor,
+                                      fontSize: screenSize.width * 0.015,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

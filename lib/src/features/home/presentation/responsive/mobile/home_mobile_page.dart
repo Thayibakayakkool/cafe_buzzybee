@@ -52,23 +52,64 @@ class HomeMobilePage extends StatelessWidget {
                     width: screenSize.width * 0.095,
                     height: screenSize.height * 0.05,
                     decoration: BoxDecoration(
-                        color: ColorsManager.whiteColor,
-                        borderRadius: BorderRadius.circular(AppSize.s8)),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CartMobilePage(),
-                            ));
-                      },
-                      icon: Icon(
-                        Icons.shopping_cart,
-                        color: ColorsManager.primaryColor,
-                        size: screenSize.width * 0.05,
-                      ),
+                      color: ColorsManager.whiteColor,
+                      borderRadius: BorderRadius.circular(AppSize.s8),
+                    ),
+                    child: Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CartMobilePage(),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.shopping_cart,
+                            color: ColorsManager.primaryColor,
+                            size: screenSize.width * 0.05,
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: BlocBuilder<CartBloc, CartState>(
+                            builder: (context, state) {
+                              if (state is CartLoaded && state.cartItems.isNotEmpty) {
+                                final cartItemCount = state.cartItems.length;
+
+                                return Container(
+                                  padding: EdgeInsets.all(screenSize.width * 0.008),
+                                  decoration: BoxDecoration(
+                                    color: ColorsManager.primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: screenSize.width * 0.04,
+                                    minHeight: screenSize.width * 0.04,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      cartItemCount.toString(),
+                                      style: TextStyle(
+                                        color: ColorsManager.whiteColor,
+                                        fontSize: screenSize.width * 0.03,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+
                 ],
               ),
               kSizedBox15,
@@ -84,11 +125,14 @@ class HomeMobilePage extends StatelessWidget {
                       width: screenSize.width * 0.08,
                       height: screenSize.height * 0.046,
                       decoration: BoxDecoration(
-                        color: ColorsManager.whiteColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: ColorsManager.primaryColor)
-                      ),
-                      child:  CustomPopUpMenuWidget(iconSize: screenSize.width * 0.035,fontSize: 15,)),
+                          color: ColorsManager.whiteColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border:
+                              Border.all(color: ColorsManager.primaryColor)),
+                      child: CustomPopUpMenuWidget(
+                        iconSize: screenSize.width * 0.035,
+                        fontSize: 15,
+                      )),
                 ],
               ),
               kSizedBox20,
@@ -132,8 +176,8 @@ class HomeMobilePage extends StatelessWidget {
                         childAspectRatio: state.crossAxisCount == 2
                             ? 1 / 1
                             : state.crossAxisCount == 3
-                            ? 1.1 / 2
-                            : 0.3 / 1,
+                                ? 1.1 / 2
+                                : 0.3 / 1,
                       ),
                       itemCount: state.filteredMenuItems.length,
                       itemBuilder: (context, index) {

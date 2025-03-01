@@ -410,7 +410,16 @@ final List<Map<String, dynamic>> waffleItem = [
   },
 ];
 
+final List<Map<String, dynamic>> all = [
+  ...signatureItem,
+  ...croissantItem,
+  ...waffleItem,
+  ...coffeeItem,
+  ...iceCreamItem
+];
+
 final Map<String, List<Map<String, dynamic>>> menuItems = {
+  'All': all,
   'Signature': signatureItem,
   'Croissant': croissantItem,
   'Waffle': waffleItem,
@@ -419,6 +428,7 @@ final Map<String, List<Map<String, dynamic>>> menuItems = {
 };
 
 final menu = [
+  {'text': 'All', 'image': Assets.signature},
   {'text': 'Signature', 'image': Assets.signature},
   {'text': 'Croissant', 'image': Assets.croissant},
   {'text': 'Waffle', 'image': Assets.waffle},
